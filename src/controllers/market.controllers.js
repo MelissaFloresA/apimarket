@@ -155,8 +155,8 @@ export const getClienteId = async (req, res) => {
 export const postClientes = async (req, res) => {
   try {
     const {
-      nombre,
-      apellido,
+      nombres,
+      apellidos,
       categoria,
       direccion_postal,
       direccion_trabajo,
@@ -176,12 +176,12 @@ export const postClientes = async (req, res) => {
     // Insertamos el nuevo cliente
     const [insertResult] = await pool.query(
       `INSERT INTO clientes 
-      (id, nombre, apellido, categoria, direccion_postal, direccion_trabajo, telefono, correo, nivel_economico, intereses) 
+      (id, nombres, apellidos, categoria, direccion_postal, direccion_trabajo, telefono, correo, nivel_economico, intereses) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         newId,
-        nombre,
-        apellido,
+        nombres,
+        apellidos,
         categoria,
         direccion_postal,
         direccion_trabajo,
@@ -207,8 +207,8 @@ export const putClientes = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      nombre,
-      apellido,
+      nombres,
+      apellidos,
       categoria,
       direccion_postal,
       direccion_trabajo,
@@ -220,11 +220,11 @@ export const putClientes = async (req, res) => {
 
     const [result] = await pool.query(
       `UPDATE clientes 
-      SET nombre = ?, apellido = ?, categoria = ?, direccion_postal = ?, direccion_trabajo = ?, telefono = ?, correo = ?, nivel_economico = ?, intereses = ? 
+      SET nombres = ?, apellidos = ?, categoria = ?, direccion_postal = ?, direccion_trabajo = ?, telefono = ?, correo = ?, nivel_economico = ?, intereses = ? 
       WHERE id = ?`,
       [
-        nombre,
-        apellido,
+        nombres,
+        apellidos,
         categoria,
         direccion_postal,
         direccion_trabajo,
