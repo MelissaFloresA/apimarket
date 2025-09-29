@@ -118,3 +118,147 @@ export const deleteProductos = async (req, res) => {
     return res.status(500).json({ message: "Algo salió mal" });
   }
 };
+
+
+// ==================== CLIENTES ====================
+
+// Obtener todos los clientes
+export const getClientes = async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM clientes");
+    if (rows.length <= 0) {
+      return res.status(404).json({ message: "No hay clientes registrados" });
+    }
+    res.json({ clientes: rows });
+  } catch (error) {
+    return res.status(500).json({ message: "Algo salió mal" });
+  }
+};
+
+// Obtener cliente por ID
+export const getClienteId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query("SELECT * FROM clientes WHERE id = ?", [
+      id,
+    ]);
+    if (rows.length <= 0) {
+      return res.status(404).json({ message: "Cliente no encontrado" });
+    }
+    res.json({ cliente: rows[0] });
+  } catch (error) {
+    return res.status(500).json({ message: "Algo salió mal" });
+  }
+};
+
+// Agregar cliente
+export const postClientes = async (req, res) => {
+  try {
+    const {
+      nombre,
+      apellido,
+      categoria,
+      direccion_postal,
+      direccion_trabajo,
+      telefono,
+      correo,
+      nivel_economico,
+      intereses,
+    } = req.body;
+
+    // Obtenemos el último ID
+    const [result] = await pool.query(
+      "SELECT MAX(id) AS last_id FROM clientes"
+    );
+    const lastId = result[0].last_id || 0;
+    const newId = lastId + 1;
+
+    // Insertamos el nuevo cliente
+    const [insertResult] = await pool.query(
+      `INSERT INTO clientes 
+      (id, nombre, apellido, categoria, direccion_postal, direccion_trabajo, telefono, correo, nivel_economico, intereses) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        newId,
+        nombre,
+        apellido,
+        categoria,
+        direccion_postal,
+        direccion_trabajo,
+        telefono,
+        correo,
+        nivel_economico,
+        intereses,
+      ]
+    );
+
+    if (insertResult.affectedRows > 0) {
+      res.json({ message: "Cliente agregado", id: newId });
+    } else {
+      res.status(400).json({ message: "No se pudo registrar el cliente" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Algo salió mal" });
+  }
+};
+
+// Modificar cliente
+export const putClientes = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      nombre,
+      apellido,
+      categoria,
+      direccion_postal,
+      direccion_trabajo,
+      telefono,
+      correo,
+      nivel_economico,
+      intereses,
+    } = req.body;
+
+    const [result] = await pool.query(
+      `UPDATE clientes 
+      SET nombre = ?, apellido = ?, categoria = ?, direccion_postal = ?, direccion_trabajo = ?, telefono = ?, correo = ?, nivel_economico = ?, intereses = ? 
+      WHERE id = ?`,
+      [
+        nombre,
+        apellido,
+        categoria,
+        direccion_postal,
+        direccion_trabajo,
+        telefono,
+        correo,
+        nivel_economico,
+        intereses,
+        id,
+      ]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Cliente no encontrado" });
+    }
+    res.json({ message: "Cliente actualizado" });
+  } catch (error) {
+    return res.status(500).json({ message: "Algo salió mal" });
+  }
+};
+
+// Eliminar cliente
+export const deleteClientes = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [result] = await pool.query("DELETE FROM clientes WHERE id = ?", [
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Cliente no encontrado" });
+    }
+    res.json({ message: "Cliente eliminado" });
+  } catch (error) {
+    return res.status(500).json({ message: "Algo salió mal" });
+  }
+};
